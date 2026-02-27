@@ -71,3 +71,19 @@
   </div>
 </body>
 </html>
+<div class="logo-container">
+  <img class="logo" src="{{ url_for('static', filename='kiif.png') }}" alt="KIIF">
+  <img class="logo" src="{{ url_for('static', filename='alkifah.png') }}" alt="Alkifah Academy">
+  <img class="logo" src="{{ url_for('static', filename='moe.png') }}" alt="Ministry of Education">
+</div>
+<style>
+.logo-container{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:20px;
+  margin:20px 0;
+  flex-wrap:wrap;
+}
+.logo{ height:60px; width:auto; }
+</style>
