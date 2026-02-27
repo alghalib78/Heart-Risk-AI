@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Heart Risk Result</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f4f6fb; }
+    .container { max-width: 750px; margin: 40px auto; padding: 0 18px; }
+    .card { background: white; padding: 30px; border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+    h1 { margin-top: 0; }
+
+    .risk-number { font-size: 60px; font-weight: bold; margin: 10px 0; }
+
+    .badge { display: inline-block; padding: 8px 16px; border-radius: 30px; font-weight: bold; margin-bottom: 16px; }
+    .low { background: #d4f5e2; color: #117a3d; }
+    .medium { background: #fff4d6; color: #a66b00; }
+    .high { background: #ffd6d6; color: #a30000; }
+
+    .progress { height: 14px; background: #e6e6e6; border-radius: 10px; overflow: hidden; margin: 16px 0 20px; }
+    .progress-bar { height: 100%; background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444); width: 0%; }
+
+    a { text-decoration: none; font-weight: bold; color: #2563eb; }
+    .disclaimer { margin-top: 16px; font-size: 0.9em; color: #555; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="card">
+    <h1>Your Estimated Risk</h1>
+
+    <div class="risk-number">{{ risk }}%</div>
+
+    {% if category == "Low" %}
+      <div class="badge low">Low Risk</div>
+    {% elif category == "Medium" %}
+      <div class="badge medium">Medium Risk</div>
+    {% else %}
+      <div class="badge high">High Risk</div>
+    {% endif %}
+
+    <div class="progress">
+      <div class="progress-bar" style="--w: {{ risk }}%"></div>
+    </div>
+
+    <p><strong>Estimated BMI:</strong> {{ bmi }}</p>
+
+    <p class="disclaimer">
+      This tool is an educational science fair demonstration. It does not replace professional medical evaluation.
+    </p>
+
+    <a href="/">← Back to Form</a>
+  </div>
+</div>
+
+</body>
+</html>
