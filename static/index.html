@@ -1,0 +1,24 @@
+<div class="logo-container">
+    <img src="{{ url_for('static', filename='kiif.png') }}" class="logo">
+    <img src="{{ url_for('static', filename='alkifah.png') }}" class="logo">
+    <img src="{{ url_for('static', filename='moe.png') }}" class="logo">
+</div>
+<style>
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+.logo {
+    height: 80px;
+}
+
+body {
+    background: linear-gradient(to right, #e6f2f5, #ffffff);
+    font-family: Arial, sans-serif;
+}
+</style>
