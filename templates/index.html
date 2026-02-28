@@ -2,77 +2,169 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Heart Attack Risk Estimator</title>
 
   <style>
-  body {
-    font-family: Arial, sans-serif;
-    min-height: 100vh;
-    background: linear-gradient(to right, #00672b, #0b2a16);
-    color: white;
-    margin: 0;
-  }
+    body{
+      font-family: Arial, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(to right, #0e672b, #0b3a20);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 30px 12px;
+    }
 
-  .logo-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    margin: 20px 0 10px 0;
-    flex-wrap: wrap;
-  }
+    .container{
+      width: 100%;
+      max-width: 520px;
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 14px;
+      padding: 18px 18px 22px;
+      box-sizing: border-box;
+    }
 
-  .logo {
-    height: 60px;
-    width: auto;
-    background: white;
-    padding: 6px;
-    border-radius: 10px;
-  }
-</style>
+    h1{
+      margin: 10px 0 18px;
+      font-size: 22px;
+      text-align: center;
+    }
+
+    .logo-container{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin: 6px 0 12px;
+    }
+
+    .logo{
+      height: 52px;
+      width: auto;
+      background: white;
+      padding: 6px;
+      border-radius: 10px;
+    }
+
+    .field{
+      margin: 12px 0;
+    }
+
+    label{
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      opacity: 0.95;
+    }
+
+    input, select{
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+
+    button{
+      width: 100%;
+      margin-top: 14px;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .error{
+      background: rgba(255, 0, 0, 0.18);
+      border: 1px solid rgba(255, 0, 0, 0.35);
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin: 10px 0 14px;
+      font-size: 14px;
+    }
+
+    .hint{
+      margin-top: 10px;
+      font-size: 12px;
+      opacity: 0.85;
+      text-align: center;
+    }
+  </style>
 </head>
 
 <body>
-
-  <!-- ✅ Logos MUST be inside BODY -->
-  <div class="logo-container">
-    <img class="logo" src="{{ url_for('static', filename='kiif.png') }}" alt="KIIF">
-    <img class="logo" src="{{ url_for('static', filename='alkifah.png') }}" alt="Alkifah Academy">
-    <img class="logo" src="{{ url_for('static', filename='moe.png') }}" alt="Ministry of Education">
-  </div>
-
   <div class="container">
+
+    <!-- LOGOS -->
+    <div class="logo-container">
+      <img class="logo" src="{{ url_for('static', filename='kiif.png') }}" alt="KIIF">
+      <img class="logo" src="{{ url_for('static', filename='alkifah.png') }}" alt="Alkifah Academy">
+      <img class="logo" src="{{ url_for('static', filename='moe.png') }}" alt="Ministry of Education">
+    </div>
+
     <h1>Heart Attack Risk Estimator</h1>
-    <p>Enter simple health inputs to estimate risk (demo for science fair).</p>
 
-    <!-- ✅ Change action="/predict" if your app route is different -->
+    <!-- ERROR MESSAGE -->
+    {% if error %}
+      <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <!-- FORM -->
     <form method="POST" action="/predict">
-      <label for="age">Age</label>
-      <input id="age" name="age" type="number" min="1" max="120" required>
 
-      <label for="height">Height (cm)</label>
-      <input id="height" name="height" type="number" min="50" max="250" required>
+      <div class="field">
+        <label for="age">Age</label>
+        <input id="age" type="number" name="age" min="1" max="120" required>
+      </div>
 
-      <label for="weight">Weight (kg)</label>
-      <input id="weight" name="weight" type="number" min="10" max="300" required>
+      <div class="field">
+        <label for="height_cm">Height (cm)</label>
+        <input id="height_cm" type="number" name="height_cm" step="0.1" min="50" max="250" required>
+      </div>
 
-      <label for="smoking">Smoking</label>
-      <select id="smoking" name="smoking" required>
-        <option value="0">No</option>
-        <option value="1">Yes</option>
-      </select>
+      <div class="field">
+        <label for="weight_kg">Weight (kg)</label>
+        <input id="weight_kg" type="number" name="weight_kg" step="0.1" min="10" max="300" required>
+      </div>
 
-      <label for="diabetes">Diabetes</label>
-      <select id="diabetes" name="diabetes" required>
-        <option value="0">No</option>
-        <option value="1">Yes</option>
-      </select>
+      <div class="field">
+        <label for="sbp">Systolic Blood Pressure (SBP)</label>
+        <input id="sbp" type="number" name="sbp" step="1" min="70" max="250" required>
+      </div>
+
+      <div class="field">
+        <label for="smoker">Smoker?</label>
+        <select id="smoker" name="smoker" required>
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="diabetes">Diabetes?</label>
+        <select id="diabetes" name="diabetes" required>
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
+        </select>
+      </div>
 
       <button type="submit">Calculate Risk</button>
-      <div class="hint">Tip: If logos still don’t appear, refresh with Cmd + Shift + R.</div>
-    </form>
-  </div>
 
+      <div class="hint">
+        If you still see 400 Bad Request, it means the form names don’t match what Python reads.
+      </div>
+
+    </form>
+
+  </div>
 </body>
 </html>

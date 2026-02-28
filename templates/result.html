@@ -1,57 +1,70 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Heart Risk Result</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Risk Result</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; background: #f4f6fb; }
-    .container { max-width: 750px; margin: 40px auto; padding: 0 18px; }
-    .card { background: white; padding: 30px; border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-    h1 { margin-top: 0; }
-
-    .risk-number { font-size: 60px; font-weight: bold; margin: 10px 0; }
-
-    .badge { display: inline-block; padding: 8px 16px; border-radius: 30px; font-weight: bold; margin-bottom: 16px; }
-    .low { background: #d4f5e2; color: #117a3d; }
-    .medium { background: #fff4d6; color: #a66b00; }
-    .high { background: #ffd6d6; color: #a30000; }
-
-    .progress { height: 14px; background: #e6e6e6; border-radius: 10px; overflow: hidden; margin: 16px 0 20px; }
-    .progress-bar { height: 100%; background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444); width: 0%; }
-
-    a { text-decoration: none; font-weight: bold; color: #2563eb; }
-    .disclaimer { margin-top: 16px; font-size: 0.9em; color: #555; }
+    body{
+      font-family: Arial, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(to right, #0e672b, #0b3a20);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 30px 12px;
+    }
+    .card{
+      width: 100%;
+      max-width: 520px;
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 14px;
+      padding: 18px;
+      box-sizing: border-box;
+    }
+    h1{ margin: 0 0 12px; text-align:center; }
+    .big{
+      font-size: 42px;
+      font-weight: 800;
+      text-align: center;
+      margin: 8px 0;
+    }
+    .cat{
+      text-align:center;
+      font-size: 18px;
+      margin-bottom: 14px;
+      opacity: 0.95;
+    }
+    .row{ margin: 6px 0; opacity: 0.95; }
+    a{
+      display:inline-block;
+      margin-top: 14px;
+      color: white;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 10px 12px;
+      border-radius: 12px;
+    }
   </style>
 </head>
 <body>
-
-<div class="container">
   <div class="card">
     <h1>Your Estimated Risk</h1>
+    <div class="big">{{ risk }}%</div>
+    <div class="cat">Category: <b>{{ category }}</b></div>
 
-    <div class="risk-number">{{ risk }}%</div>
+    <div class="row">BMI: <b>{{ bmi }}</b></div>
+    <div class="row">Age: <b>{{ age }}</b></div>
+    <div class="row">Height: <b>{{ height_cm }}</b> cm</div>
+    <div class="row">Weight: <b>{{ weight_kg }}</b> kg</div>
+    <div class="row">SBP: <b>{{ sbp }}</b></div>
+    <div class="row">Smoker: <b>{{ smoker }}</b></div>
+    <div class="row">Diabetes: <b>{{ diabetes }}</b></div>
 
-    {% if category == "Low" %}
-      <div class="badge low">Low Risk</div>
-    {% elif category == "Medium" %}
-      <div class="badge medium">Medium Risk</div>
-    {% else %}
-      <div class="badge high">High Risk</div>
-    {% endif %}
-
-    <div class="progress">
-      <div class="progress-bar" style="--w: {{ risk }}%"></div>
-    </div>
-
-    <p><strong>Estimated BMI:</strong> {{ bmi }}</p>
-
-    <p class="disclaimer">
-      This tool is an educational science fair demonstration. It does not replace professional medical evaluation.
-    </p>
-
-    <a href="/">← Back to Form</a>
+    <a href="/">← Back</a>
   </div>
-</div>
-
 </body>
 </html>

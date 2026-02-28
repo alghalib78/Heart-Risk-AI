@@ -1,110 +1,106 @@
+import os
 from flask import Flask, render_template, request
-import math
 
 app = Flask(__name__)
 
-def clamp(x, lo=1, hi=99):
-    return max(lo, min(hi, x))
-def risk_category(risk_percent: float) -> str:
-    if risk_percent < 35:
-        return "Low"
-    elif risk_percent < 65:
-        return "Medium"
-    else:
-        return "High"
 def calc_bmi(height_cm: float, weight_kg: float) -> float:
     h_m = height_cm / 100.0
-    return weight_kg / (h_m * h_m + 1e-9)
+    if h_m <= 0:
+        return 0.0
+    return weight_kg / (h_m * h_m)
 
-def risk_percent(age: int, sex: str, height_cm: float, weight_kg: float,
-                 smoker: str, fam_diabetes: str, fam_cancer: str,
-                 chest_pain: str, sbp_str: str) -> float:
-    """
-    Educational demo scoring (NOT medical diagnosis).
-    Uses a logistic-style score -> percent.
-    """
-
-    bmi = calc_bmi(height_cm, weight_kg)
-
-    # Base score (negative = low baseline risk)
-    score = -6.0
+def estimate_risk(age: int, bmi: float, sbp: float, smoker: str, diabetes: str) -> float:
+    # Simple demo risk score (NOT medical advice)
+    score = 0.0
 
     # Age
-    score += 0.05 * (age - 30)   # risk rises after ~30
+    if age >= 60:
+        score += 18
+    elif age >= 50:
+        score += 12
+    elif age >= 40:
+        score += 7
+    elif age >= 30:
+        score += 3
 
-    # Sex (rough demo placeholder; not a clinical rule)
-    if sex == "male":
-        score += 0.35
+    # BMI
+    if bmi >= 35:
+        score += 10
+    elif bmi >= 30:
+        score += 7
+    elif bmi >= 25:
+        score += 3
 
-    # BMI influence
-    score += 0.08 * (bmi - 25)
+    # SBP
+    if sbp >= 160:
+        score += 12
+    elif sbp >= 140:
+        score += 8
+    elif sbp >= 130:
+        score += 4
 
-    # Smoking
+    # Smoking / diabetes
     if smoker == "yes":
-        score += 0.85
+        score += 10
+    if diabetes == "yes":
+        score += 10
 
-    # Family history (simple yes/no for demo)
-    if fam_diabetes == "yes":
-        score += 0.55
-    if fam_cancer == "yes":
-        score += 0.25
+    # Convert to 0–100-ish “percent”
+    risk = min(95.0, max(1.0, score))
+    return round(risk, 1)
 
-    # Chest pain
-    if chest_pain == "yes":
-        score += 0.90
-
-    # Optional blood pressure (SBP)
-    sbp_str = (sbp_str or "").strip()
-    if sbp_str != "":
-        try:
-            sbp = float(sbp_str)
-            score += 0.03 * (sbp - 120)  # higher SBP increases score
-        except ValueError:
-            pass  # ignore if user typed non-number
-
-    # Convert to probability
-    prob = 1 / (1 + math.exp(-score))
-    return round(clamp(prob * 100), 0)
-
+def risk_category(risk: float) -> str:
+    if risk < 10:
+        return "Low"
+    if risk < 25:
+        return "Moderate"
+    if risk < 45:
+        return "High"
+    return "Very High"
 
 @app.route("/", methods=["GET"])
 def home():
     return render_template("index.html")
 
-
-@app.route("/predict", methods=["POST"])
 @app.route("/predict", methods=["POST"])
 def predict():
-    # Required fields
-    age = int(request.form["age"])
-    sex = request.form["sex"]
-    height_cm = float(request.form["height_cm"])
-    weight_kg = float(request.form["weight_kg"])
+    # Use .get() so we NEVER crash with 400 BadRequestKeyError
+    age_str = request.form.get("age", "").strip()
+    height_str = request.form.get("height_cm", "").strip()
+    weight_str = request.form.get("weight_kg", "").strip()
+    sbp_str = request.form.get("sbp", "").strip()
+    smoker = request.form.get("smoker", "no").strip().lower()
+    diabetes = request.form.get("diabetes", "no").strip().lower()
 
-    # Optional/Yes-No fields
-    sbp = request.form.get("sbp", "")
-    smoker = request.form.get("smoker", "no")
-    fam_diabetes = request.form.get("fam_diabetes", "no")
-    fam_cancer = request.form.get("fam_cancer", "no")
-    chest_pain = request.form.get("chest_pain", "no")
+    # Basic validation
+    if not age_str or not height_str or not weight_str or not sbp_str:
+        return render_template("index.html", error="Please fill in all fields.")
 
-    risk = risk_percent(
+    try:
+        age = int(age_str)
+        height_cm = float(height_str)
+        weight_kg = float(weight_str)
+        sbp = float(sbp_str)
+    except ValueError:
+        return render_template("index.html", error="Numbers look invalid. Please try again.")
+
+    bmi = round(calc_bmi(height_cm, weight_kg), 1)
+    risk = estimate_risk(age, bmi, sbp, smoker, diabetes)
+    category = risk_category(risk)
+
+    return render_template(
+        "result.html",
+        risk=risk,
+        category=category,
+        bmi=bmi,
         age=age,
-        sex=sex,
         height_cm=height_cm,
         weight_kg=weight_kg,
+        sbp=sbp,
         smoker=smoker,
-        fam_diabetes=fam_diabetes,
-        fam_cancer=fam_cancer,
-        chest_pain=chest_pain,
-        sbp_str=sbp
+        diabetes=diabetes
     )
 
-    category = risk_category(risk)
-    bmi = round(calc_bmi(height_cm, weight_kg), 1)
-
-    return render_template("result.html", risk=risk, bmi=bmi, category=category)
-
-
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
